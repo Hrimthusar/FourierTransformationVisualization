@@ -3,11 +3,11 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: calc(100vh - 80px);
+  height: calc(100vh - 120px);
   background: #000;
 }
 
-canvas {}
+/* canvas {} */
 
 .chart div {
   font: 10px sans-serif;
@@ -16,4 +16,20 @@ canvas {}
   padding: 3px;
   margin: 1px;
   color: white;
+}
+
+#mediaControl {
+  display: inline-grid;
+  grid-column-gap: 20px;
+  width: calc(100% - 40px);
+  grid-template-columns: 80px auto 180px 180px 180px;
+  margin: 20px 20px;
+}
+
+#inputControl {
+  display: inline-grid;
+  grid-column-gap: 20px;
+  width: calc(100% - 40px);
+  grid-template-columns: 80px 80px auto;
+  margin: 20px 20px;
 }

@@ -24,15 +24,37 @@ class MainGraph extends Component {
     this.transformedData = []
   }
 
-  // componentDidMount() {
-  //   const height = this.divElement.clientHeight;
-  //       this.setState({ height });
-  // }
+  reduceDataAverage(data, num=10000) {
+    let n = data.length;
+    if(n<num)
+      return data;
+
+    let step = Math.ceil(n/num);
+    let ret = [];
+
+    let curr = 0;
+    for(let i=0; i<n; i++){
+      curr+=data[i];
+      if(i%step === 0){
+        ret.push(curr/step);
+        curr=0;
+      }
+    }
+    return ret;
+  }
 
   componentDidUpdate() {
-    // TODO RANDOM OR PICKED SECONDS
-    this.data = this.props.songData.slice(5000,5100);
-    console.log(this.data)
+    if(this.props.start === undefined || this.props.end === undefined)
+      return;
+
+    if(this.props.isPlaying !== true)
+      return;
+
+    this.data = this.props.songData.slice(this.props.start,this.props.end);
+    this.data = this.reduceDataAverage(this.data);
+    // console.log(this.data.length);
+    // this.data = this.props.songData.slice(50000, 51000);
+    // console.log(this.data)
 
     let min = Math.min.apply(Math,this.data)
     this.data = this.data.map(point => point-min)
@@ -40,8 +62,8 @@ class MainGraph extends Component {
     let max = Math.max.apply(Math,this.data)
     this.data = this.data.map(point => point/max)
 
-    console.log("######")
-    console.log(this.data)
+    // console.log("######")
+    // console.log(this.data)
 
 
     this.app.ticker.add(delta => this.gameLoop(delta));
@@ -95,9 +117,9 @@ class MainGraph extends Component {
 
   drawSignalSection = ({data, center}) => {
     this.drawCoordinateSystem({
-        center: {x:0, y:center.y},
-        top:this.app.renderer.height, left:0, width: this.app.renderer.width, height: this.topSectionHeight
-      })
+      center: {x:0, y:center.y},
+      top:this.app.renderer.height, left:0, width: this.app.renderer.width, height: this.topSectionHeight
+    })
     this.drawSignal({data, center});
   }
 
@@ -165,7 +187,6 @@ class MainGraph extends Component {
     integral.y /= data.length;
     this.drawIntegral(integral.x, integral.y);
 
-    console.log(this.botSectionHeight/radius)
     let scaleFix = this.botSectionHeight/radius;
     this.transformedData.push((integral.x - center.x)*scaleFix)
 
@@ -175,7 +196,7 @@ class MainGraph extends Component {
   drawTransformationSection = ({data}) => {
     let center = {x:this.app.renderer.width/2,y:this.app.renderer.height/2}
     let radius = Math.min(this.canvasWidth/2,
-       this.canvasHeight/2 - this.topSectionHeight - this.botSectionHeight)
+      this.canvasHeight/2 - this.topSectionHeight - this.botSectionHeight)
        - this.sectionGap;
 
     let top = center.y + radius;
@@ -201,7 +222,7 @@ class MainGraph extends Component {
     this.drawSignalSection({
       data, 
       center:{x:0,
-         y:this.app.renderer.height-
+        y:this.app.renderer.height-
          this.topSectionHeight
       }
     })
@@ -214,7 +235,10 @@ class MainGraph extends Component {
 
     this.app.stage.addChild(this.graphics);
 
-    this.f+=0.0001*delta
+    // this.f+=0.0001*delta
+    this.f+=this.props.speed*delta
+    // console.log(this.props.speed);
+
   }
 
   updatePixiCnt = element => {
@@ -229,7 +253,7 @@ class MainGraph extends Component {
   };
 
   render() {
-    console.log("CRTAM")
+    // console.log("CRTAM")
     return <div id="canvas" ref={this.updatePixiCnt} />;
   }
 }
