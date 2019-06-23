@@ -17,13 +17,21 @@ class MainGraph extends Component {
     this.topSectionHeight = 50;
     this.botSectionHeight = 50;
     this.sectionGap = 20;
-    this.coordinateSystemExtra = 10;
+    this.coordinateSystemExtra = 30;
 
     this.f = 0;
-    this.data = this.props.songData
-    this.transformedData = []
+    this.data = this.props.songData;
+    this.length = this.props.songLength;
+    this.oscilationNumber = 0;
+    this.oscilationProgress = 0;
+
+    this.transformedData = [];
+
+    this.renderText = [];
+
   }
 
+  // TODO 10000 - parameter
   reduceDataAverage(data, num=10000) {
     let n = data.length;
     if(n<num)
@@ -52,26 +60,18 @@ class MainGraph extends Component {
 
     this.data = this.props.songData.slice(this.props.start,this.props.end);
     this.data = this.reduceDataAverage(this.data);
-    // console.log(this.data.length);
-    // this.data = this.props.songData.slice(50000, 51000);
-    // console.log(this.data)
+    this.length = this.props.songLength;
 
-    let min = Math.min.apply(Math,this.data)
-    this.data = this.data.map(point => point-min)
+    let min = Math.min.apply(Math,this.data);
+    this.data = this.data.map(point => point-min);
 
-    let max = Math.max.apply(Math,this.data)
-    this.data = this.data.map(point => point/max)
-
-    // console.log("######")
-    // console.log(this.data)
-
+    let max = Math.max.apply(Math,this.data);
+    this.data = this.data.map(point => point/max);
 
     this.app.ticker.add(delta => this.gameLoop(delta));
   }
 
   setup = () => {
-    // Changes coordinate system so y grows from bottom to top
-    // And adds padding
     this.app.stage.position.x = this.canvasPadding;
     this.app.stage.scale.x = (this.app.renderer.width-2*this.canvasPadding)/this.app.renderer.width;
     this.app.stage.position.y = this.app.renderer.height / this.app.renderer.resolution;
@@ -80,14 +80,14 @@ class MainGraph extends Component {
 
   // e^ix = cosx + i*sinx
   eulerFormula = x => {
-    return [Math.cos(x), Math.sin(x)]
+    return [Math.cos(x), Math.sin(x)];
   }
 
   convertToCircle = ({data, f = .01, radius = 100, center={x:0, y:0}}) => {
     let t=0;
 
     // TODO WITH MAP
-    let transformed = []
+    let transformed = [];
 
     for (const point of data) {
       let newPoint = this.eulerFormula(-Math.PI*2*t);
@@ -95,31 +95,77 @@ class MainGraph extends Component {
       newPoint[0] = newPoint[0] * radius * point + center.x;
       newPoint[1] = newPoint[1] * radius * point + center.y;
 
-      transformed.push(newPoint)
-      t+=f
+      transformed.push(newPoint);
+      t+=f;
     }
 
-    // console.log(transformed)
-    return transformed
+    if(t>this.oscilationNumber){
+      this.oscilationNumber++;
+    }
+    this.oscilationProgress = this.oscilationNumber-t;
+
+    return transformed;
   }
 
-  drawCoordinateSystem = ({center, top, left, width, height, step, grid= true, color=0x9999ff}) => {
+  drawCoordinateSystem = ({center, top, left, width, height, steps=2, color=0x9999ff, x_min=0, x_max=0, showTicks=false, ticksTop=false, showText=false, scaledTicks=false, formula=(v=>v)}) => {
+    let tickHeight=30;
+
     this.graphics.lineStyle(1, color);
 
+    // Draw X axis
     this.graphics.moveTo(left - this.coordinateSystemExtra, center.y);
     this.graphics.lineTo(left + width + this.coordinateSystemExtra, center.y);
     this.graphics.endFill();
 
+    // Draw Y axis
     this.graphics.moveTo(center.x, top + this.coordinateSystemExtra);
     this.graphics.lineTo(center.x, top - height - this.coordinateSystemExtra);
     this.graphics.endFill();
+
+    // Draw Ticks
+    if(showTicks){
+      let gap = {length:width/steps, value:(x_max-x_min)/steps};
+      if(scaledTicks) {
+        gap.length =  (gap.length*(steps) + gap.length*this.oscilationProgress)/(steps+1);
+      }
+      for(let i=0; i<=steps; i++){
+        this.graphics.moveTo(left + i*gap.length, center.y - tickHeight/2);
+        this.graphics.lineTo(left + i*gap.length, center.y + tickHeight/2);
+        this.graphics.endFill();
+
+        if(showText){
+          let val = (x_min + i*gap.value);
+          var valText = new PIXI.Text((steps<=10 || i%Math.ceil(steps/10)===0)?formula(val).toFixed(2):``, {
+            fill: color,
+            fontFamily: `Courier New`,
+            fontWeight: `lighter`,
+            fontSize:  tickHeight/2,
+          });
+
+          // Position the text
+          valText.x = left + i*gap.length - (i===steps ? tickHeight : 0);
+          if(ticksTop)
+            valText.y =  top + this.coordinateSystemExtra;
+          else
+            valText.y =  center.y - tickHeight/2;
+
+          valText.scale.y = -1;
+
+          this.renderText.push(valText);
+        }
+      }
+    }
   }
 
   drawSignalSection = ({data, center}) => {
     this.drawCoordinateSystem({
       center: {x:0, y:center.y},
-      top:this.app.renderer.height, left:0, width: this.app.renderer.width, height: this.topSectionHeight
-    })
+      top:this.app.renderer.height, left:0, width: this.app.renderer.width, height: this.topSectionHeight,
+      showTicks: true,
+      showText: true,
+      x_max: this.length,
+      steps: 10
+    });
     this.drawSignal({data, center});
   }
 
@@ -139,14 +185,21 @@ class MainGraph extends Component {
   drawTransformedSignalSection = ({data, center, color=0xffffff}) => {
     this.drawCoordinateSystem({
       center: {x:0, y:center.y},
-      top:this.topSectionHeight, left:0, width: this.app.renderer.width, height: this.topSectionHeight
-    })
+      top:this.topSectionHeight, left:0, width: this.app.renderer.width, height: this.topSectionHeight,
+      showTicks: true,
+      steps: this.oscilationNumber,
+      scaledTicks: true,
+      x_max: this.oscilationNumber/(this.length*1000),
+      showText: true,
+      ticksTop: true,
+      formula: (v => (this.length*1000)/v)
+    });
     this.drawTransformedSignal({data, center, color});
   }
 
   drawTransformedSignal = ({data, center, color=0xffffff}) => {
     if(data.length < 2)
-      return
+      return;
 
     this.graphics.lineStyle(2, color);
 
@@ -188,13 +241,13 @@ class MainGraph extends Component {
     this.drawIntegral(integral.x, integral.y);
 
     let scaleFix = this.botSectionHeight/radius;
-    this.transformedData.push((integral.x - center.x)*scaleFix)
+    this.transformedData.push((integral.x - center.x)*scaleFix);
 
     this.graphics.endFill();
   }
 
   drawTransformationSection = ({data}) => {
-    let center = {x:this.app.renderer.width/2,y:this.app.renderer.height/2}
+    let center = {x:this.app.renderer.width/2,y:this.app.renderer.height/2};
     let radius = Math.min(this.canvasWidth/2,
       this.canvasHeight/2 - this.topSectionHeight - this.botSectionHeight)
        - this.sectionGap;
@@ -204,9 +257,9 @@ class MainGraph extends Component {
     
     this.drawCoordinateSystem({
       center, top, left, width: 2*radius, height: 2*radius
-    })
+    });
 
-    this.drawTransformation({data, center, radius})
+    this.drawTransformation({data, center, radius});
         
   }
 
@@ -214,6 +267,9 @@ class MainGraph extends Component {
   gameLoop(delta){
     if(!this.props.isPlaying)
       return;
+
+    this.renderText = [];
+    this.app.stage.removeChildren();
 
     let data = this.data;
 
@@ -225,20 +281,20 @@ class MainGraph extends Component {
         y:this.app.renderer.height-
          this.topSectionHeight
       }
-    })
+    });
     this.drawTransformationSection({data});
     this.drawTransformedSignalSection({
       data: this.transformedData, 
       center:{x:0,y:this.botSectionHeight/2},
       color: 0xff5555 
-    })
+    });
 
     this.app.stage.addChild(this.graphics);
+    this.renderText.forEach(
+      t => this.app.stage.addChild(t)
+    );
 
-    // this.f+=0.0001*delta
-    this.f+=this.props.speed*delta
-    // console.log(this.props.speed);
-
+    this.f+=this.props.speed*delta;
   }
 
   updatePixiCnt = element => {
@@ -253,7 +309,6 @@ class MainGraph extends Component {
   };
 
   render() {
-    // console.log("CRTAM")
     return <div id="canvas" ref={this.updatePixiCnt} />;
   }
 }

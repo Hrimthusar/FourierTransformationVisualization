@@ -1,41 +1,39 @@
 import React, { Component } from "react";
 import "./App.css";
 
-// import fft from "fft-js";
-
-import Loader from "./components/Loader"
-import Controls from "./components/Controls"
-import MainGraph from "./components/MainGraph"
+import Loader from "./components/Loader";
+import Controls from "./components/Controls";
+import MainGraph from "./components/MainGraph";
 
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      songData: [...Array(10000).keys()],
+      songData: [],
+      songLength: 0,
       isPlaying: false,
       speed:0
-    }
+    };
   }
 
-  onUploaded = songData => {
-    this.setState({songData:songData})
+  onUploaded = (songData, songLength) => {
+    this.setState({songData, songLength});
   }
 
   rangeChange = (start, end) => {
-    this.setState({start:start, end:end})
+    this.setState({start:start, end:end});
   }
 
   speedChange = (speed) => {
-    this.setState({speed:speed})
+    this.setState({speed:speed});
   }
 
   onPlay = () => {
-    this.setState({isPlaying:!this.state.isPlaying})
+    this.setState({isPlaying:!this.state.isPlaying});
   }
 
   render() {
-    // console.log(fft);
     return (
       <div className="App">
         <Loader 
@@ -44,6 +42,7 @@ class App extends Component {
         ></Loader>
         <MainGraph 
           songData={this.state.songData}
+          songLength={this.state.songLength}
           isPlaying={this.state.isPlaying}
           start={this.state.start}
           end={this.state.end}
@@ -55,6 +54,7 @@ class App extends Component {
           speedChange={this.speedChange}>
         </Controls>
       </div>
-    );  }
+    );  
+  }
 }
 export default App;

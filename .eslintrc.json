@@ -2,6 +2,8 @@
   "extends": "react-app",
   "rules": {
     "no-console": "warn",
-    "indent": ["error", 2]
+    "indent": ["error", 2],
+    "semi": ["error", "always"],
+    "quotes": ["error", "backtick"]
   }
 }
