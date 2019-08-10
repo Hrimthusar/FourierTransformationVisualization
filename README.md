@@ -55,22 +55,22 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 ## Workflow
 
 <p align="center">
-  Click on Choose File:
+  Click on Choose File:<br>
   <img src="public/images/1.png?raw=true"
          alt="Workflow Screen Shot 1" width="500">
-  Choose File:
+  Choose File:<br>
   <img src="public/images/2.png?raw=true"
          alt="Workflow Screen Shot 2" width="500">
-  Convert loaded file:
+  Convert loaded file:<br>
   <img src="public/images/3.png?raw=true"
          alt="Workflow Screen Shot 3" width="500">
-  Adjust duration:
+  Adjust duration:<br>
   <img src="public/images/4.png?raw=true"
          alt="Workflow Screen Shot 4" width="500">
-  Click play:
+  Click play:<br>
   <img src="public/images/5.png?raw=true"
          alt="Workflow Screen Shot 5" width="500">
-  Enjoy :)
+  Enjoy :)<br>
   <img src="public/images/6.png?raw=true"
          alt="Workflow Screen Shot 6" width="500">
 </p>
