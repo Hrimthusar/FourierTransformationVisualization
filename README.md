@@ -11,6 +11,11 @@
   </a> for Scientific Computing course @<a href="http://www.math.rs/eng/">MATF</a>
 </div>
 
+## Table of Contents
+- [Installation](#installation)
+- [Running](#running)
+- [Workflow](#workflow)
+
 ## Installation
 Install NodeJS from https://nodejs.org/en/download/
 
