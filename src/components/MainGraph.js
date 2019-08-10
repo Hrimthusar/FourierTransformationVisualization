@@ -51,7 +51,7 @@ class MainGraph extends Component {
     return ret;
   }
 
-  componentDidUpdate() {
+  initData() {
     if(this.props.start === undefined || this.props.end === undefined)
       return;
 
@@ -68,7 +68,13 @@ class MainGraph extends Component {
     let max = Math.max.apply(Math,this.data);
     this.data = this.data.map(point => point/max);
 
+    
+
     this.app.ticker.add(delta => this.gameLoop(delta));
+  }
+
+  componentDidUpdate() {
+    this.initData();
   }
 
   setup = () => {
@@ -85,8 +91,6 @@ class MainGraph extends Component {
 
   convertToCircle = ({data, f = .01, radius = 100, center={x:0, y:0}}) => {
     let t=0;
-
-    // TODO WITH MAP
     let transformed = [];
 
     for (const point of data) {
@@ -128,6 +132,7 @@ class MainGraph extends Component {
       if(scaledTicks) {
         gap.length =  (gap.length*(steps) + gap.length*this.oscilationProgress)/(steps+1);
       }
+
       for(let i=0; i<=steps; i++){
         this.graphics.moveTo(left + i*gap.length, center.y - tickHeight/2);
         this.graphics.lineTo(left + i*gap.length, center.y + tickHeight/2);
@@ -166,19 +171,21 @@ class MainGraph extends Component {
       x_max: this.length,
       steps: 10
     });
-    this.drawSignal({data, center});
+
+    let signalTop = this.app.render.height - center.y + this.topSectionHeight;
+    this.drawSignal({data, center, signalTop});
   }
 
-  drawSignal = ({data, center, color=0xffff00}) => {
+  drawSignal = ({data, center, color=0xffff00, top=20}) => {
     this.graphics.lineStyle(2, color);
 
     this.graphics.moveTo(0+center.x, data[0]+center.y);
 
     let step = this.app.renderer.width / this.app.renderer.resolution / data.length;
 
-    // TODO CALCULATE MAX AND SCALE WITH SPACE NOT 20
+    let max = Math.max(...data);
     data.forEach(function(point, i) {
-      this.graphics.lineTo(i*step + center.x, point*20 + center.y );
+      this.graphics.lineTo(i*step + center.x, point*top/max*2 + center.y );
     }.bind(this));
   }
 
@@ -186,13 +193,6 @@ class MainGraph extends Component {
     this.drawCoordinateSystem({
       center: {x:0, y:center.y},
       top:this.topSectionHeight, left:0, width: this.app.renderer.width, height: this.topSectionHeight,
-      showTicks: true,
-      steps: this.oscilationNumber,
-      scaledTicks: true,
-      x_max: this.oscilationNumber/(this.length*1000),
-      showText: true,
-      ticksTop: true,
-      formula: (v => (this.length*1000)/v)
     });
     this.drawTransformedSignal({data, center, color});
   }
@@ -280,7 +280,7 @@ class MainGraph extends Component {
       center:{x:0,
         y:this.app.renderer.height-
          this.topSectionHeight
-      }
+      },
     });
     this.drawTransformationSection({data});
     this.drawTransformedSignalSection({

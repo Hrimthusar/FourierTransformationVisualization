@@ -52,22 +52,27 @@ readUploadedFileAsText = inputFile => {
 };
 
 getAudioBuffer = async () => {
-  let audioCtx = new AudioContext();
 
+  let AudioContext = window.AudioContext // Default
+                  || window.webkitAudioContext // Safari and old versions of Chrome
+                  || false; 
+
+  let audioCtx = new AudioContext();
+  
   if (!this._fileInput || !this._fileInput.files[0]) {
     return null;
   }
 
   let audioFile = await this.readUploadedFileAsText(this._fileInput.files[0]);
-  audioCtx.decodeAudioData(audioFile).then(
-    function(buffer) {
-      let ch0 = buffer.getChannelData(0);
-      this.props.onUploaded(ch0, buffer.duration);
-      this.setState({length:ch0.length, start:0, end:ch0.length-1});
-      this.props.rangeChange(0, ch0.length-1);
-      return buffer;
-    }.bind(this)
-  );
+
+  // Callbacks for Safari
+  audioCtx.decodeAudioData(audioFile, function(buffer) {
+    let ch0 = buffer.getChannelData(0);
+    this.props.onUploaded(ch0, buffer.duration);
+    this.setState({length:ch0.length, start:0, end:ch0.length-1});
+    this.props.rangeChange(0, ch0.length-1);
+    return buffer;
+  }.bind(this)); 
 };
 
 render() {
@@ -85,7 +90,7 @@ render() {
         onClick={this.getAudioBuffer.bind(this)}
         className="btn btn-outline-primary"
       >
-        Compress
+        Convert
       </button>
       <Range 
         min={0}

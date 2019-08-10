@@ -1,6 +1,26 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<h1 align="center">Fourier Transformation Visualisation</h1>
 
-## Available Scripts
+<p align="center">
+  <img src="public/images/splash.png?raw=true"
+         alt="Workflow Screen Shot 1" width="500">
+</p>
+
+<div align="center">
+  <sub>Built with ReactJS and PixiJS by
+  <a href="https://github.com/ZivanovicLuka">Luka</a> 
+  </a> for Scientific Computing course @<a href="http://www.math.rs/eng/">MATF</a>
+</div>
+
+## Installation
+Install NodeJS from https://nodejs.org/en/download/
+
+```sh
+$ git clone https://github.com/ZivanovicLuka/FourierTransformationVisualization
+$ cd FourierTransformationVisualization
+$ npm i
+```
+
+## Running
 
 In the project directory, you can run:
 
@@ -11,11 +31,6 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.<br>
 You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 ### `npm run build`
 
@@ -37,32 +52,25 @@ Instead, it will copy all the configuration files and the transitive dependencie
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-## Learn More
+## Workflow
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+<p align="center">
+  Click on Choose File:
+  <img src="public/images/1.png?raw=true"
+         alt="Workflow Screen Shot 1" width="500">
+  Choose File:
+  <img src="public/images/2.png?raw=true"
+         alt="Workflow Screen Shot 2" width="500">
+  Convert loaded file:
+  <img src="public/images/3.png?raw=true"
+         alt="Workflow Screen Shot 3" width="500">
+  Adjust duration:
+  <img src="public/images/4.png?raw=true"
+         alt="Workflow Screen Shot 4" width="500">
+  Click play:
+  <img src="public/images/5.png?raw=true"
+         alt="Workflow Screen Shot 5" width="500">
+  Enjoy :)
+  <img src="public/images/6.png?raw=true"
+         alt="Workflow Screen Shot 6" width="500">
+</p>
